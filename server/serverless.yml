@@ -1,0 +1,40 @@
+service: waitlist-wizard-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'prod'}
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+    NODE_ENV: production
+    FRONTEND_URL: ${env:FRONTEND_URL}
+    JWT_SECRET: ${env:JWT_SECRET}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - ${env:FRONTEND_URL}
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PATCH
+        - DELETE
+        - OPTIONS
+
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
+
+plugins:
+  - serverless-offline
+

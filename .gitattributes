@@ -1,0 +1,9 @@
+# Ensure .env files are never committed
+.env* filter=git-crypt diff=git-crypt
+server/.env* filter=git-crypt diff=git-crypt
+
+# Protect sensitive files
+*.pem filter=git-crypt diff=git-crypt
+*.key filter=git-crypt diff=git-crypt
+*.secret filter=git-crypt diff=git-crypt
+
