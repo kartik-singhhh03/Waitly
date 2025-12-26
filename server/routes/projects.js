@@ -1,7 +1,8 @@
-const express = require('express');
+
+import express from 'express';
+import { query } from '../db/index.js';
+import { authenticate } from '../middleware/auth.js';
 const router = express.Router();
-const { query } = require('../db');
-const { authenticate } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticate);
@@ -159,7 +160,7 @@ router.patch('/:id', async (req, res, next) => {
 router.post('/:id/rotate-key', async (req, res, next) => {
   try {
     // Generate new API key
-    const crypto = require('crypto');
+    import crypto from 'crypto';
     const newApiKey = 'wl_live_' + crypto.randomBytes(16).toString('hex');
 
     const result = await query(
@@ -212,5 +213,5 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
 

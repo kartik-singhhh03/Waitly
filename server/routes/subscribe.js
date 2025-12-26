@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { query } from '../db/index.js';
+import { checkRateLimit } from '../middleware/rateLimit.js';
 const router = express.Router();
-const { query } = require('../db');
-const { checkRateLimit } = require('../middleware/rateLimit');
 
 // Validate email format
 const validateEmail = (email) => {
@@ -198,5 +198,5 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
 

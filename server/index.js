@@ -1,8 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Validate required environment variables
 const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
@@ -36,13 +38,21 @@ const apiLimiter = rateLimit({
 });
 
 // Routes
-app.use('/api/subscribe', require('./routes/subscribe'));
-app.use('/api/public', require('./routes/public'));
-app.use('/api/projects', apiLimiter, require('./routes/projects'));
-app.use('/api/entries', apiLimiter, require('./routes/entries'));
-app.use('/api/stats', apiLimiter, require('./routes/stats'));
-app.use('/api/auth', apiLimiter, require('./routes/auth'));
-app.use('/api/auth', apiLimiter, require('./routes/auth-magic-link'));
+import subscribeRouter from './routes/subscribe.js';
+import publicRouter from './routes/public.js';
+import projectsRouter from './routes/projects.js';
+import entriesRouter from './routes/entries.js';
+import statsRouter from './routes/stats.js';
+import authRouter from './routes/auth.js';
+import authMagicLinkRouter from './routes/auth-magic-link.js';
+
+app.use('/api/subscribe', subscribeRouter);
+app.use('/api/public', publicRouter);
+app.use('/api/projects', apiLimiter, projectsRouter);
+app.use('/api/entries', apiLimiter, entriesRouter);
+app.use('/api/stats', apiLimiter, statsRouter);
+app.use('/api/auth', apiLimiter, authRouter);
+app.use('/api/auth', apiLimiter, authMagicLinkRouter);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -76,5 +86,5 @@ if (!process.env.VERCEL && !process.env.LAMBDA_TASK_ROOT) {
   });
 }
 
-module.exports = app;
+export default app;
 

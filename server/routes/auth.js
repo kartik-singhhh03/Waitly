@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import { query } from '../db/index.js';
+import { generateToken, authenticate } from '../middleware/auth.js';
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const { query } = require('../db');
-const { generateToken, authenticate } = require('../middleware/auth');
 
 // POST /api/auth/signup
 router.post('/signup', async (req, res, next) => {
@@ -156,5 +156,5 @@ router.get('/me', authenticate, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
 

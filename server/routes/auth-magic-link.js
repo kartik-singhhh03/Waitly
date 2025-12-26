@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import crypto from 'crypto';
+import { query } from '../db/index.js';
+import { generateToken } from '../middleware/auth.js';
 const router = express.Router();
-const crypto = require('crypto');
-const { query } = require('../db');
-const { generateToken } = require('../middleware/auth');
 
 // Store magic links in memory (in production, use Redis)
 const magicLinks = new Map();
@@ -147,5 +147,5 @@ router.post('/magic-link/verify', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
 

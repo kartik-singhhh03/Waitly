@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
+import { query } from '../db/index.js';
 const router = express.Router();
-const { query } = require('../db');
 
 // GET /api/public/project/:slug - Get public project info (for embed script)
 router.get('/project/:slug', async (req, res, next) => {
@@ -31,5 +31,5 @@ router.get('/project/:slug', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
 

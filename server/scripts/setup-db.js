@@ -5,10 +5,12 @@
  * Reads schema.sql and executes it against the database
  */
 
-require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
-const { Pool } = require('pg');
+
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { Pool } from 'pg';
+dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -19,7 +21,7 @@ async function setupDatabase() {
   try {
     console.log('📊 Connecting to database...');
     
-    const schemaPath = path.join(__dirname, '../db/schema.sql');
+    const schemaPath = path.join(path.dirname(new URL(import.meta.url).pathname), '../db/schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     
     console.log('📝 Executing schema...');

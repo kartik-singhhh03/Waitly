@@ -1,5 +1,5 @@
 // PM2 ecosystem file for production
-module.exports = {
+export default {
   apps: [{
     name: 'waitlist-api',
     script: './index.js',

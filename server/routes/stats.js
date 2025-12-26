@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { query } from '../db/index.js';
+import { authenticate } from '../middleware/auth.js';
 const router = express.Router();
-const { query } = require('../db');
-const { authenticate } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticate);
@@ -55,5 +55,5 @@ router.get('/:projectId', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
 

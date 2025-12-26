@@ -1,24 +1,29 @@
-const jwt = require('jsonwebtoken');
-const { query } = require('../db');
+
+import jwt from 'jsonwebtoken';
+import { query } from '../db/index.js';
 
 // JWT_SECRET must be set via environment variable
 // Never use a default secret in production!
+
 const JWT_SECRET = process.env.JWT_SECRET;
+
 
 if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
   throw new Error('JWT_SECRET environment variable is required in production');
 }
 
 // Only allow default in development
+
 const DEFAULT_SECRET = 'dev-secret-key-change-in-production';
 const secret = JWT_SECRET || DEFAULT_SECRET;
+
 
 if (!JWT_SECRET && process.env.NODE_ENV !== 'production') {
   console.warn('⚠️  WARNING: Using default JWT_SECRET. Set JWT_SECRET in .env for production!');
 }
 
 // Middleware to verify JWT token
-const authenticate = async (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     
@@ -66,12 +71,10 @@ const authenticate = async (req, res, next) => {
 };
 
 // Generate JWT token
-const generateToken = (userId) => {
+
+export const generateToken = (userId) => {
   return jwt.sign({ userId }, secret, { expiresIn: '7d' });
 };
 
-module.exports = {
-  authenticate,
-  generateToken
-};
+
 

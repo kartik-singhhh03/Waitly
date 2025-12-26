@@ -1,9 +1,10 @@
+
 // Lambda-compatible entry point
-const serverless = require('serverless-http');
-const app = require('./index');
+import serverless from 'serverless-http';
+import app from './index.js';
 
 // Export handler for AWS Lambda
-module.exports.handler = serverless(app, {
+export const handler = serverless(app, {
   binary: ['image/*', 'application/pdf']
 });
 

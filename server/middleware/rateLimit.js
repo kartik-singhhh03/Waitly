@@ -1,4 +1,4 @@
-const { query } = require('../db');
+import { query } from '../db/index.js';
 
 // Rate limit: 100 requests per minute per API key
 const RATE_LIMIT = 100;
@@ -54,7 +54,5 @@ const checkRateLimit = async (apiKey) => {
   }
 };
 
-module.exports = {
-  checkRateLimit
-};
+export { checkRateLimit };
 

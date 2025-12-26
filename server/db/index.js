@@ -1,5 +1,6 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Optimize for serverless: smaller pool, shorter timeouts
 // Vercel serverless functions are stateless and short-lived
@@ -39,8 +40,5 @@ const query = async (text, params) => {
   }
 };
 
-module.exports = {
-  pool,
-  query
-};
+export { pool, query };
 
