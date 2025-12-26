@@ -1,12 +1,15 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Optimize for serverless: smaller pool, shorter timeouts
+// Vercel serverless functions are stateless and short-lived
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
+  ssl: process.env.NODE_ENV === 'production' || process.env.VERCEL ? { rejectUnauthorized: false } : false,
+  max: process.env.VERCEL ? 2 : 20, // Smaller pool for serverless
+  idleTimeoutMillis: process.env.VERCEL ? 10000 : 30000, // Shorter timeout for serverless
   connectionTimeoutMillis: 2000,
+  allowExitOnIdle: true, // Allow process to exit when idle (important for serverless)
 });
 
 // Test connection

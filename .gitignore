@@ -28,6 +28,7 @@ build/
 .serverless/
 .next/
 out/
+.vercel/
 
 # Logs
 *.log
