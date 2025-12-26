@@ -1,0 +1,10 @@
+server/node_modules
+server/scripts
+server/Dockerfile
+server/ecosystem.config.js
+server/serverless.yml
+server/index.lambda.js
+server/.env
+server/.env.*
+!server/env.example
+

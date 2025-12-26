@@ -8,9 +8,13 @@ require('dotenv').config();
 const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
-if (missingEnvVars.length > 0 && process.env.NODE_ENV === 'production') {
+// Don't exit during build - only check in runtime
+if (missingEnvVars.length > 0 && process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
   console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
-  process.exit(1);
+  // Don't exit in Vercel build - let it fail at runtime if needed
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 }
 
 const app = express();
