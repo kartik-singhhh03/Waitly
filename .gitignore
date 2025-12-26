@@ -79,3 +79,6 @@ ecosystem.config.js.local
 
 # Docker
 .dockerignore.local
+
+.vercel
+.env*.local
