@@ -2,27 +2,29 @@
 import jwt from 'jsonwebtoken';
 import { query } from '../db/index.js';
 
-// JWT_SECRET must be set via environment variable
-// Never use a default secret in production!
-
+// ✅ SECURITY: JWT_SECRET MUST be set in production
+// Get secret from environment, with strict validation
 const JWT_SECRET = process.env.JWT_SECRET;
 
-
-if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
-  throw new Error('JWT_SECRET environment variable is required in production');
+// ✅ CRITICAL: Fail fast if JWT_SECRET is missing in production
+if (!JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+    console.error('❌ CRITICAL: JWT_SECRET environment variable is REQUIRED');
+    throw new Error('JWT_SECRET environment variable must be set for security');
+  }
+  console.warn('⚠️  WARNING: Using insecure development JWT_SECRET. NEVER deploy this to production!');
 }
 
-// Only allow default in development
+// Development fallback (ONLY for local development)
+const DEFAULT_DEV_SECRET = 'dev-secret-key-NEVER-use-in-production';
+const secret = JWT_SECRET || DEFAULT_DEV_SECRET;
 
-const DEFAULT_SECRET = 'dev-secret-key-change-in-production';
-const secret = JWT_SECRET || DEFAULT_SECRET;
-
-
-if (!JWT_SECRET && process.env.NODE_ENV !== 'production') {
-  console.warn('⚠️  WARNING: Using default JWT_SECRET. Set JWT_SECRET in .env for production!');
+// ✅ SECURITY: Minimum secret length validation
+if (secret.length < 32 && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET must be at least 32 characters for security');
 }
 
-// Middleware to verify JWT token
+// ✅ Middleware to verify JWT token with security best practices
 export const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -30,23 +32,26 @@ export const authenticate = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        error: 'No token provided'
+        error: 'Authentication required. Please provide a valid token.'
       });
     }
 
     const token = authHeader.substring(7);
+    
+    // ✅ SECURITY: Verify token signature and expiration
     const decoded = jwt.verify(token, secret);
     
-    // Verify user still exists
+    // ✅ SECURITY: Verify user still exists in database
     const result = await query('SELECT id, email FROM users WHERE id = $1', [decoded.userId]);
     
     if (result.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        error: 'User not found'
+        error: 'User account not found. Token may be invalid.'
       });
     }
 
+    // ✅ Attach verified user to request
     req.user = {
       id: decoded.userId,
       email: result.rows[0].email
@@ -54,26 +59,39 @@ export const authenticate = async (req, res, next) => {
     
     next();
   } catch (error) {
+    // ✅ SECURITY: Specific error messages for different JWT errors
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        error: 'Invalid token'
+        error: 'Invalid authentication token'
       });
     }
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        error: 'Token expired'
+        error: 'Authentication token has expired. Please sign in again.'
       });
     }
+    console.error('Authentication error:', error);
     next(error);
   }
 };
 
-// Generate JWT token
-
+// ✅ Generate JWT token with security best practices
 export const generateToken = (userId) => {
-  return jwt.sign({ userId }, secret, { expiresIn: '7d' });
+  if (!userId) {
+    throw new Error('userId is required to generate token');
+  }
+  
+  return jwt.sign(
+    { userId }, 
+    secret, 
+    { 
+      expiresIn: '7d', // Token expires in 7 days
+      issuer: 'waitly',
+      algorithm: 'HS256' // Explicit algorithm to prevent algorithm confusion attacks
+    }
+  );
 };
 
 

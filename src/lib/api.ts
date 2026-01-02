@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// ✅ CRITICAL FIX: Use relative paths for Vercel deployment
+// In production (Vercel), API routes are at /api/* (same origin)
+// In development, use VITE_API_URL or default to localhost
+const API_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3001');
 
 // Helper function to make API requests
 async function apiRequest<T>(
@@ -16,18 +20,38 @@ async function apiRequest<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
 
-  const data = await response.json();
+    // ✅ CRITICAL FIX: Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('❌ Expected JSON but got:', contentType, '\nResponse:', text.substring(0, 200));
+      throw new Error(
+        `API returned ${contentType || 'non-JSON'} instead of JSON. ` +
+        `This usually means the API route doesn't exist or failed. ` +
+        `Endpoint: ${endpoint}`
+      );
+    }
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Request failed');
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || `Request failed with status ${response.status}`);
+    }
+
+    return data;
+  } catch (error) {
+    // Re-throw with more context
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(`Network error calling ${endpoint}: ${error}`);
   }
-
-  return data;
 }
 
 // Auth API
@@ -177,23 +201,42 @@ export const statsApi = {
 };
 
 // Subscribe API (public, no auth)
+// ✅ Uses same defensive JSON parsing as apiRequest
 export const subscribeApi = {
   subscribe: async (apiKey: string, email: string, ref?: string) => {
-    const response = await fetch(`${API_URL}/api/subscribe`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ apiKey, email, ref }),
-    });
+    try {
+      const response = await fetch(`${API_URL}/api/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apiKey, email, ref }),
+      });
 
-    const data = await response.json();
+      // ✅ Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('❌ Expected JSON but got:', contentType, '\nResponse:', text.substring(0, 200));
+        throw new Error(
+          `API returned ${contentType || 'non-JSON'} instead of JSON. ` +
+          `This usually means the API route doesn't exist or failed.`
+        );
+      }
 
-    if (!response.ok) {
-      throw new Error(data.error || 'Subscription failed');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Subscription failed');
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(`Network error during subscription: ${error}`);
     }
-
-    return data;
   },
 };
 

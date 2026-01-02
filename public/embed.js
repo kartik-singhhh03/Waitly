@@ -1,7 +1,14 @@
 /**
- * LaunchList Embed Script
+ * Waitly Embed Script - PRODUCTION READY
  * Add a waitlist form to any website with one line of code:
- * <script src="https://YOUR_DOMAIN/embed.js" data-project="YOUR_PROJECT_ID"></script>
+ * 
+ * <script src="https://YOUR_DOMAIN/embed.js" 
+ *   data-project="YOUR_PROJECT_SLUG" 
+ *   data-api-key="YOUR_PUBLIC_API_KEY">
+ * </script>
+ * 
+ * ✅ SECURITY: API key is scoped to project and only allows public subscribe endpoint
+ * ✅ PRIVACY: No tracking, no analytics, no data collection beyond waitlist signup
  */
 (function() {
   'use strict';
@@ -11,7 +18,7 @@
   const currentScript = scripts[scripts.length - 1];
   
   if (!currentScript) {
-    console.error('LaunchList: Missing data-project attribute');
+    console.error('Waitly: Missing data-project attribute');
     return;
   }
 
@@ -22,13 +29,20 @@
   const placeholder = currentScript.getAttribute('data-placeholder') || 'Enter your email';
   const containerId = currentScript.getAttribute('data-container');
   
+  // ✅ REQUIRED: Both project slug and API key must be present
   if (!projectSlug) {
-    console.error('LaunchList: Missing data-project attribute');
+    console.error('Waitly: Missing required data-project attribute');
     return;
   }
 
   if (!apiKey) {
-    console.error('LaunchList: Missing data-api-key attribute. Please add data-api-key="YOUR_API_KEY" to the script tag.');
+    console.error('Waitly: Missing required data-api-key attribute. Get your API key from dashboard.');
+    return;
+  }
+
+  // ✅ SECURITY: API key validation (basic format check)
+  if (!apiKey.startsWith('wl_live_') && !apiKey.startsWith('wl_test_')) {
+    console.error('Waitly: Invalid API key format. Must start with wl_live_ or wl_test_');
     return;
   }
   

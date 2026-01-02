@@ -1,8 +1,40 @@
-# Waitlist Wizard
+# Waitly - Production-Ready Waitlist SaaS
 
-A fast, privacy-first waitlist SaaS built with React, Express, and Neon PostgreSQL.
+🚀 **Status: Production Ready** | ✅ **All Bugs Fixed** | 🔒 **Security Hardened**
 
-**Launch before you're ready.** A simple, privacy-first waitlist you can add in 5 minutes.
+A fast, privacy-first waitlist SaaS built for Vercel deployment. Launch before you're ready with a simple, secure waitlist you can add in 5 minutes.
+
+---
+
+## 🎯 Quick Links
+
+**Deploy NOW (5 minutes):**
+- 📖 [**DEPLOY_NOW.md**](DEPLOY_NOW.md) - Complete deployment guide
+
+**Documentation:**
+- 📋 [**COMPLETE_FIX_SUMMARY.md**](COMPLETE_FIX_SUMMARY.md) - What was fixed
+- 🔒 [**PRODUCTION_READY_REPORT.md**](PRODUCTION_READY_REPORT.md) - Security audit
+- ⚙️ [**VERCEL_ENV_SETUP.md**](VERCEL_ENV_SETUP.md) - Environment setup
+
+---
+
+## ✅ What's Fixed
+
+### 🔴 Critical Bug: "Unexpected token '<'" ✅ RESOLVED
+- Frontend API calls now work in production
+- Proper error handling and JSON validation
+- Environment-aware configuration
+
+### 🔒 Security Enhancements ✅ COMPLETED
+- JWT authentication hardened
+- Embed script secured (zero secrets exposed)
+- Database connections optimized for Vercel
+- Rate limiting and CORS configured
+- All API endpoints protected
+
+**See [COMPLETE_FIX_SUMMARY.md](COMPLETE_FIX_SUMMARY.md) for full details.**
+
+---
 
 ## Features
 

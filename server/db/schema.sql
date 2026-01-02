@@ -1,3 +1,7 @@
+-- ✅ Enable required PostgreSQL extensions
+-- pgcrypto: Provides gen_random_bytes() for secure random generation
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Create waitlist mode enum
 CREATE TYPE waitlist_mode AS ENUM ('fifo', 'random', 'score_based', 'manual');
 
@@ -27,7 +31,7 @@ CREATE TABLE IF NOT EXISTS projects (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
-  api_key TEXT NOT NULL UNIQUE DEFAULT ('wl_live_' || encode(gen_random_bytes(16), 'hex')),
+  api_key TEXT NOT NULL UNIQUE DEFAULT ('wl_live_' || encode(gen_random_bytes(16)::bytea, 'hex')),
   mode waitlist_mode NOT NULL DEFAULT 'fifo',
   is_frozen BOOLEAN NOT NULL DEFAULT false,
   email_confirmation_required BOOLEAN NOT NULL DEFAULT false,
@@ -42,7 +46,7 @@ CREATE TABLE IF NOT EXISTS waitlist_entries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
-  referral_code TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(6), 'hex'),
+  referral_code TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(6)::bytea, 'hex'),
   referred_by TEXT,
   priority_score INTEGER NOT NULL DEFAULT 0,
   joined_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
