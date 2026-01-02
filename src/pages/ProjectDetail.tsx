@@ -217,7 +217,10 @@ const ProjectDetail = () => {
     );
   }
 
-  const apiEndpoint = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/subscribe`;
+  // ✅ Use same API URL logic as api.ts for consistency
+  const API_BASE = import.meta.env.VITE_API_URL || 
+    (import.meta.env.MODE === 'production' ? window.location.origin : 'http://localhost:3001');
+  const apiEndpoint = `${API_BASE}/api/subscribe`;
 
   return (
     <div className="min-h-screen bg-background">
