@@ -110,7 +110,7 @@ const Hero = () => {
                 {'\n'}
                 <span className="text-accent">fetch</span>
                 <span className="text-foreground">(</span>
-                <span className="text-primary">'https://api.waitly.io/v1/subscribe'</span>
+                <span className="text-primary">'/api/subscribe'</span>
                 <span className="text-foreground">, {'{'}</span>
                 {'\n  '}
                 <span className="text-foreground">method: </span>
@@ -118,12 +118,12 @@ const Hero = () => {
                 <span className="text-foreground">,</span>
                 {'\n  '}
                 <span className="text-foreground">headers: {'{'} </span>
-                <span className="text-primary">'x-api-key'</span>
+                <span className="text-primary">'Content-Type'</span>
                 <span className="text-foreground">: </span>
-                <span className="text-primary">'your_api_key'</span>
+                <span className="text-primary">'application/json'</span>
                 <span className="text-foreground"> {'}'},</span>
                 {'\n  '}
-                <span className="text-foreground">body: JSON.stringify({'{'} email {'}'})</span>
+                <span className="text-foreground">body: JSON.stringify({'{'} projectId, email {'}'})</span>
                 {'\n'}
                 <span className="text-foreground">{'}'})</span>
               </code>

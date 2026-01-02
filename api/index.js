@@ -435,12 +435,14 @@ app.get('/api/stats/:projectId', authenticate, async (req, res) => {
 // ============================================
 // PUBLIC SUBSCRIBE ROUTE (No Auth Required)
 // ============================================
+// ✅ SECURITY: Uses projectId (slug) instead of API key
+// API keys are NEVER exposed to the client
 app.post('/api/subscribe', async (req, res) => {
   try {
-    const { apiKey, email, ref } = req.body;
+    const { projectId, email, ref } = req.body;
 
-    if (!apiKey || !email) {
-      return res.status(400).json({ success: false, error: 'API key and email are required' });
+    if (!projectId || !email) {
+      return res.status(400).json({ success: false, error: 'Project ID and email are required' });
     }
 
     // Validate email
@@ -449,14 +451,19 @@ app.post('/api/subscribe', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid email format' });
     }
 
-    // Get project by API key
+    // Validate projectId format (alphanumeric with dashes, 3-50 chars)
+    if (!/^[a-z0-9-]{3,50}$/i.test(projectId)) {
+      return res.status(400).json({ success: false, error: 'Invalid project ID format' });
+    }
+
+    // Get project by slug (public identifier)
     const projectResult = await query(
-      'SELECT id, is_frozen, show_position FROM projects WHERE api_key = $1',
-      [apiKey]
+      'SELECT id, is_frozen, show_position FROM projects WHERE slug = $1',
+      [projectId.toLowerCase()]
     );
 
     if (projectResult.rows.length === 0) {
-      return res.status(401).json({ success: false, error: 'Invalid API key' });
+      return res.status(404).json({ success: false, error: 'Project not found' });
     }
 
     const project = projectResult.rows[0];

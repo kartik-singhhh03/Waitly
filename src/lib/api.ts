@@ -201,16 +201,16 @@ export const statsApi = {
 };
 
 // Subscribe API (public, no auth)
-// ✅ Uses same defensive JSON parsing as apiRequest
+// ✅ SECURITY: Uses projectId (slug) only - NO API keys exposed
 export const subscribeApi = {
-  subscribe: async (apiKey: string, email: string, ref?: string) => {
+  subscribe: async (projectId: string, email: string, ref?: string) => {
     try {
       const response = await fetch(`${API_URL}/api/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ apiKey, email, ref }),
+        body: JSON.stringify({ projectId, email, ref }),
       });
 
       // ✅ Check if response is JSON

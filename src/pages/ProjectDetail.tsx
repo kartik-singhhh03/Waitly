@@ -490,7 +490,7 @@ const ProjectDetail = () => {
           </TabsContent>
 
           <TabsContent value="integration" className="space-y-6">
-            <IntegrationSnippets apiKey={project.api_key} apiEndpoint={apiEndpoint} projectId={project.id} projectSlug={project.slug} />
+            <IntegrationSnippets apiEndpoint={apiEndpoint} projectId={project.id} projectSlug={project.slug} />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
@@ -625,8 +625,8 @@ const ProjectDetail = () => {
 };
 
 // Integration Snippets Component
-const IntegrationSnippets = ({ apiKey, apiEndpoint, projectId, projectSlug }: { 
-  apiKey: string; 
+// ✅ SECURITY: NO API keys exposed in any snippets
+const IntegrationSnippets = ({ apiEndpoint, projectId, projectSlug }: { 
   apiEndpoint: string;
   projectId: string;
   projectSlug: string;
@@ -637,19 +637,15 @@ const IntegrationSnippets = ({ apiKey, apiEndpoint, projectId, projectSlug }: {
   // Get the current domain for embed script
   const embedDomain = window.location.origin;
 
+  // ✅ ALL SNIPPETS USE projectId (slug) ONLY - NO API KEYS
   const snippets = {
     embed: `<!-- One-line embed - just add this to your HTML -->
-<script 
-  src="${embedDomain}/embed.js" 
-  data-project="${projectSlug}"
-  data-api-key="${apiKey}"
-></script>
+<script src="${embedDomain}/embed.js" data-project="${projectSlug}"></script>
 
 <!-- Optional: Customize with attributes -->
 <script 
   src="${embedDomain}/embed.js" 
   data-project="${projectSlug}"
-  data-api-key="${apiKey}"
   data-theme="dark"
   data-button-text="Join the Waitlist"
   data-placeholder="your@email.com"
@@ -660,11 +656,11 @@ const IntegrationSnippets = ({ apiKey, apiEndpoint, projectId, projectSlug }: {
 <script 
   src="${embedDomain}/embed.js" 
   data-project="${projectSlug}"
-  data-api-key="${apiKey}"
   data-container="my-waitlist"
 ></script>`,
     react: `import { useState } from 'react';
 
+// ✅ SECURE: Uses projectId only, no API keys exposed
 function WaitlistForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({ loading: false, message: '' });
@@ -678,7 +674,7 @@ function WaitlistForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apiKey: '${apiKey}',
+          projectId: '${projectSlug}',
           email: email
         })
       });
@@ -715,6 +711,7 @@ function WaitlistForm() {
     nextjs: `'use client';
 import { useState } from 'react';
 
+// ✅ SECURE: Uses projectId only, no API keys exposed
 export default function WaitlistForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<{ loading: boolean; message: string }>({ 
@@ -731,7 +728,7 @@ export default function WaitlistForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apiKey: '${apiKey}',
+          projectId: '${projectSlug}',
           email
         })
       });
@@ -791,6 +788,7 @@ export default function WaitlistForm() {
   </form>
 
   <script>
+    // ✅ SECURE: Uses projectId only, no API keys exposed
     document.getElementById('waitlist-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
@@ -801,7 +799,7 @@ export default function WaitlistForm() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            apiKey: '${apiKey}',
+            projectId: '${projectSlug}',
             email: email
           })
         });
@@ -822,13 +820,15 @@ export default function WaitlistForm() {
 </body>
 </html>`,
     fetch: `// JavaScript Fetch API Example
+// ✅ SECURE: Uses projectId only, no API keys exposed
+
 const response = await fetch('${apiEndpoint}', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    apiKey: '${apiKey}',
+    projectId: '${projectSlug}',
     email: 'user@example.com',
     ref: 'optional_referral_code' // Optional
   })
@@ -861,6 +861,18 @@ const data = await response.json();
 
   return (
     <div className="space-y-6">
+      {/* Security Notice */}
+      <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 flex items-start gap-3">
+        <Shield className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+        <div>
+          <h4 className="font-semibold text-green-500">Secure by Design</h4>
+          <p className="text-sm text-muted-foreground mt-1">
+            All integration snippets use your public project ID only. No secret API keys are ever exposed in client-side code.
+            This is safe to use in any website, framework, or embed.
+          </p>
+        </div>
+      </div>
+
       {/* Embed Script Highlight */}
       <div className="bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6">
         <div className="flex items-start gap-4">

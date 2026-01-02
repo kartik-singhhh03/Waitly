@@ -1,14 +1,19 @@
 /**
- * Waitly Embed Script - PRODUCTION READY
- * Add a waitlist form to any website with one line of code:
+ * Waitly Embed Script - SECURE & PRODUCTION READY
  * 
- * <script src="https://YOUR_DOMAIN/embed.js" 
- *   data-project="YOUR_PROJECT_SLUG" 
- *   data-api-key="YOUR_PUBLIC_API_KEY">
- * </script>
+ * ✅ SECURITY MODEL:
+ * - Uses projectId (slug) only - NO secret API keys
+ * - Safe to expose in any client-side code
+ * - Server validates projectId and handles all security
  * 
- * ✅ SECURITY: API key is scoped to project and only allows public subscribe endpoint
- * ✅ PRIVACY: No tracking, no analytics, no data collection beyond waitlist signup
+ * Usage:
+ * <script src="https://YOUR_DOMAIN/embed.js" data-project="your-project-slug"></script>
+ * 
+ * Optional attributes:
+ * - data-theme="dark" | "light"
+ * - data-button-text="Join Waitlist"
+ * - data-placeholder="Enter your email"
+ * - data-container="element-id"
  */
 (function() {
   'use strict';
@@ -22,33 +27,26 @@
     return;
   }
 
-  const projectSlug = currentScript.getAttribute('data-project');
-  const apiKey = currentScript.getAttribute('data-api-key');
+  const projectId = currentScript.getAttribute('data-project');
   const theme = currentScript.getAttribute('data-theme') || 'dark';
   const buttonText = currentScript.getAttribute('data-button-text') || 'Join Waitlist';
   const placeholder = currentScript.getAttribute('data-placeholder') || 'Enter your email';
   const containerId = currentScript.getAttribute('data-container');
   
-  // ✅ REQUIRED: Both project slug and API key must be present
-  if (!projectSlug) {
+  // ✅ REQUIRED: Project ID must be present
+  if (!projectId) {
     console.error('Waitly: Missing required data-project attribute');
     return;
   }
 
-  if (!apiKey) {
-    console.error('Waitly: Missing required data-api-key attribute. Get your API key from dashboard.');
-    return;
-  }
-
-  // ✅ SECURITY: API key validation (basic format check)
-  if (!apiKey.startsWith('wl_live_') && !apiKey.startsWith('wl_test_')) {
-    console.error('Waitly: Invalid API key format. Must start with wl_live_ or wl_test_');
+  // Validate projectId format
+  if (!/^[a-z0-9-]{3,50}$/i.test(projectId)) {
+    console.error('Waitly: Invalid project ID format. Use lowercase letters, numbers, and dashes only.');
     return;
   }
   
-  // API endpoint - will be set dynamically based on script location
+  // API endpoint - derived from script source
   const API_URL = (function() {
-    // Try to get from script src, fallback to current origin
     const scripts = document.querySelectorAll('script[src*="embed.js"]');
     if (scripts.length > 0) {
       const scriptSrc = scripts[scripts.length - 1].src;
@@ -60,17 +58,17 @@
 
   // Styles
   const styles = `
-    .ll-waitlist-container {
+    .wl-waitlist-container {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       max-width: 400px;
       margin: 0 auto;
     }
-    .ll-waitlist-form {
+    .wl-waitlist-form {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
-    .ll-waitlist-input {
+    .wl-waitlist-input {
       flex: 1;
       min-width: 200px;
       padding: 12px 16px;
@@ -82,14 +80,14 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .ll-waitlist-input:focus {
+    .wl-waitlist-input:focus {
       border-color: #00d4aa;
       box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
     }
-    .ll-waitlist-input::placeholder {
+    .wl-waitlist-input::placeholder {
       color: ${theme === 'dark' ? '#666' : '#999'};
     }
-    .ll-waitlist-button {
+    .wl-waitlist-button {
       padding: 12px 24px;
       font-size: 14px;
       font-weight: 600;
@@ -101,33 +99,33 @@
       transition: transform 0.2s, box-shadow 0.2s;
       white-space: nowrap;
     }
-    .ll-waitlist-button:hover {
+    .wl-waitlist-button:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
     }
-    .ll-waitlist-button:disabled {
+    .wl-waitlist-button:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
-    .ll-waitlist-message {
+    .wl-waitlist-message {
       margin-top: 12px;
       padding: 12px 16px;
       border-radius: 8px;
       font-size: 14px;
       text-align: center;
     }
-    .ll-waitlist-success {
-      background: ${theme === 'dark' ? 'rgba(0, 212, 170, 0.1)' : 'rgba(0, 212, 170, 0.1)'};
+    .wl-waitlist-success {
+      background: rgba(0, 212, 170, 0.1);
       color: #00d4aa;
       border: 1px solid rgba(0, 212, 170, 0.2);
     }
-    .ll-waitlist-error {
-      background: ${theme === 'dark' ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 107, 107, 0.1)'};
+    .wl-waitlist-error {
+      background: rgba(255, 107, 107, 0.1);
       color: #ff6b6b;
       border: 1px solid rgba(255, 107, 107, 0.2);
     }
-    .ll-waitlist-privacy {
+    .wl-waitlist-privacy {
       margin-top: 8px;
       font-size: 11px;
       color: ${theme === 'dark' ? '#666' : '#999'};
@@ -135,21 +133,21 @@
       align-items: center;
       gap: 4px;
     }
-    .ll-waitlist-privacy svg {
+    .wl-waitlist-privacy svg {
       width: 12px;
       height: 12px;
     }
-    .ll-spinner {
+    .wl-spinner {
       display: inline-block;
       width: 14px;
       height: 14px;
       border: 2px solid transparent;
       border-top-color: currentColor;
       border-radius: 50%;
-      animation: ll-spin 0.8s linear infinite;
+      animation: wl-spin 0.8s linear infinite;
       margin-right: 8px;
     }
-    @keyframes ll-spin {
+    @keyframes wl-spin {
       to { transform: rotate(360deg); }
     }
   `;
@@ -160,27 +158,28 @@
   document.head.appendChild(styleSheet);
 
   // Create the form HTML
+  const safeProjectId = projectId.replace(/[^a-z0-9-]/gi, '');
   const formHTML = `
-    <div class="ll-waitlist-container" id="ll-waitlist-${projectSlug}">
-      <form class="ll-waitlist-form" id="ll-form-${projectSlug}">
+    <div class="wl-waitlist-container" id="wl-waitlist-${safeProjectId}">
+      <form class="wl-waitlist-form" id="wl-form-${safeProjectId}">
         <input 
           type="email" 
-          class="ll-waitlist-input" 
-          id="ll-email-${projectSlug}"
+          class="wl-waitlist-input" 
+          id="wl-email-${safeProjectId}"
           placeholder="${placeholder}"
           required
           autocomplete="email"
         />
-        <button type="submit" class="ll-waitlist-button" id="ll-button-${projectSlug}">
+        <button type="submit" class="wl-waitlist-button" id="wl-button-${safeProjectId}">
           ${buttonText}
         </button>
       </form>
-      <div id="ll-message-${projectSlug}"></div>
-      <div class="ll-waitlist-privacy">
+      <div id="wl-message-${safeProjectId}"></div>
+      <div class="wl-waitlist-privacy">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>
-        Privacy-first waitlist. No tracking.
+        Privacy-first
       </div>
     </div>
   `;
@@ -192,7 +191,6 @@
   }
   
   if (!container) {
-    // Create container after the script tag
     container = document.createElement('div');
     currentScript.parentNode.insertBefore(container, currentScript.nextSibling);
   }
@@ -200,10 +198,10 @@
   container.innerHTML = formHTML;
 
   // Handle form submission
-  const form = document.getElementById(`ll-form-${projectSlug}`);
-  const emailInput = document.getElementById(`ll-email-${projectSlug}`);
-  const button = document.getElementById(`ll-button-${projectSlug}`);
-  const messageDiv = document.getElementById(`ll-message-${projectSlug}`);
+  const form = document.getElementById(`wl-form-${safeProjectId}`);
+  const emailInput = document.getElementById(`wl-email-${safeProjectId}`);
+  const button = document.getElementById(`wl-button-${safeProjectId}`);
+  const messageDiv = document.getElementById(`wl-message-${safeProjectId}`);
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -217,17 +215,18 @@
 
     // Disable button and show loading
     button.disabled = true;
-    button.innerHTML = '<span class="ll-spinner"></span>Joining...';
+    button.innerHTML = '<span class="wl-spinner"></span>Joining...';
     messageDiv.innerHTML = '';
 
     try {
+      // ✅ SECURITY: Only send projectId (slug), NOT any secret keys
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          apiKey: apiKey,
+          projectId: projectId,
           email: email,
           ref: ref
         })
@@ -239,8 +238,6 @@
         let message = "You're on the list!";
         if (data.position) {
           message = "You're #" + data.position + " on the waitlist!";
-        } else if (data.tier) {
-          message = data.tier + " - You're on the list!";
         }
         
         if (data.message) {
@@ -253,21 +250,21 @@
           message += '<br><small style="opacity: 0.8; margin-top: 8px; display: block;">Share to move up: <a href="' + referralUrl + '" style="color: inherit; text-decoration: underline;">' + referralUrl + '</a></small>';
         }
 
-        messageDiv.innerHTML = '<div class="ll-waitlist-message ll-waitlist-success">' + message + '</div>';
+        messageDiv.innerHTML = '<div class="wl-waitlist-message wl-waitlist-success">' + message + '</div>';
         emailInput.value = '';
         button.innerHTML = 'Joined!';
         
         // Trigger custom event for analytics
-        window.dispatchEvent(new CustomEvent('launchlist:signup', {
+        window.dispatchEvent(new CustomEvent('waitly:signup', {
           detail: { email, position: data.position, referralCode: data.referralCode }
         }));
       } else {
-        messageDiv.innerHTML = '<div class="ll-waitlist-message ll-waitlist-error">' + (data.error || 'Something went wrong') + '</div>';
+        messageDiv.innerHTML = '<div class="wl-waitlist-message wl-waitlist-error">' + (data.error || 'Something went wrong') + '</div>';
         button.innerHTML = buttonText;
         button.disabled = false;
       }
     } catch (error) {
-      messageDiv.innerHTML = '<div class="ll-waitlist-message ll-waitlist-error">Network error. Please try again.</div>';
+      messageDiv.innerHTML = '<div class="wl-waitlist-message wl-waitlist-error">Network error. Please try again.</div>';
       button.innerHTML = buttonText;
       button.disabled = false;
     }
