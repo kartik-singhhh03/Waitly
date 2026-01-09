@@ -1,4 +1,4 @@
-import { Zap, Github, Twitter } from "lucide-react";
+import { Zap, Github, Twitter, Linkedin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -18,10 +18,13 @@ const Footer = () => {
               Privacy-first, developer-friendly, and beautifully simple.
             </p>
             <div className="flex gap-4 mt-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="https://x.com/kartik_singhhh" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="https://www.linkedin.com/in/kartik-singh-879b6b288/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Linkedin className="h-5 w-5" />
+              </a>
+              <a href="https://github.com/kartik-singhhh03" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Github className="h-5 w-5" />
               </a>
             </div>
@@ -51,10 +54,19 @@ const Footer = () => {
 
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 Waitly. All rights reserved.
+            © 2026 Waitly. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
-            Built with 💚 for indie hackers
+            Built with 💚 by{" "}
+            <a 
+              href="https://x.com/kartik_singhhh" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Kartik Singh
+            </a>
+            {" "}— Founder & Developer
           </p>
         </div>
       </div>
